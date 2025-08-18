@@ -3,7 +3,6 @@ import { Modal } from "./Modal";
 
 export const Lobby = () => {
 	const [modalFade, setModalFade] = useState(false);
-
 	return (
 		<>
 			{!modalFade ? (
@@ -17,7 +16,9 @@ export const Lobby = () => {
 					</button>
 				</div>
 			) : (
-				<Modal />
+				<div className="transform transition">
+					<Modal modalFade={modalFade} setModalFade={setModalFade} />
+				</div>
 			)}
 		</>
 	);
