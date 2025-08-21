@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Steps } from "./Steps";
+import { Modal } from "./Modal";
 
 export const Lobby = () => {
 	const [modalFade, setModalFade] = useState(false);
@@ -16,7 +17,10 @@ export const Lobby = () => {
 					</button>
 				</div>
 			) : (
-				<Steps modalFade={modalFade} setModalFade={setModalFade} />
+				<div className="bg-white size-1/2 p-10 rounded-md flex justify-between">
+					<Steps modalFade={modalFade} setModalFade={setModalFade} />
+					<Modal />
+				</div>
 			)}
 		</>
 	);
