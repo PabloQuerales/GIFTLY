@@ -5,16 +5,19 @@ export const Modal = (props) => {
 	const [formData, setFormData] = useState({
 		name: "",
 		eventType: "",
-		participants: ""
+		participants: 0
 	});
 
 	const handleChange = (e) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
-
 	const handleNext = () => {
 		if (step < 3) {
-			setStep(step + 1);
+			if (step === 1 && formData.name !== "") {
+				setStep(step + 1);
+			} else if (step === 2 && formData.eventType !== "") {
+				setStep(step + 1);
+			}
 		} else {
 			console.log("Datos finales:", formData);
 			setFormData({ name: "", eventType: "", participants: "" });
@@ -38,10 +41,10 @@ export const Modal = (props) => {
 
 							<input
 								type="text"
-								id="Confirm"
 								name="name"
 								value={formData.name}
 								onChange={handleChange}
+								required
 								className="mt-4 p-2 w-1/2 rounded border-gray-300 shadow-md sm:text-sm text-black"
 							/>
 						</label>
@@ -62,9 +65,9 @@ export const Modal = (props) => {
 										Invitados recomendados <br /> entre 4 y 16
 									</span>
 								</div>
-								<input type="checkbox" className="checkbox checkbox-primary" checked />
+								<input type="checkbox" name="eventType" value="family" onClick={handleChange} className="checkbox checkbox-primary" />
 							</label>
-							<label className="custom-option text-center flex w-1/2 flex-col items-center gap-3">
+							<label className="custom-option text-center flex w-1/2 flex-col items-center gap-3 text-gray-400 cursor-no-drop">
 								<span className="flex flex-col">
 									<span className="mb-1 font-bold text-amber-900">Laboral</span>
 									<span className="text-xs">Ideal para el trabajo y reuniones mas formales con invitaciones por correo electrónico.</span>
@@ -73,13 +76,39 @@ export const Modal = (props) => {
 										entre 10 y 20
 									</span>
 								</span>
-								<input type="checkbox" className="checkbox checkbox-primary" disabled />
+								<input type="checkbox" name="eventType" value="labor" onChange={handleChange} className="checkbox checkbox-primary" disabled />
 							</label>
 						</div>
 					</div>
 				);
 			case 3:
-				return <h1>test</h1>;
+				return (
+					<div className="flex flex-col justify-center items-center gap-2">
+						<p>Ahora necesitamos que nos indiques el número de participantes.</p>
+						<span className="font-bold">Numero par entre 2 y 16</span>
+						<div className="input w-1/2">
+							<input type="text" name="participants" value={formData.participants} />
+							<span className="my-auto flex gap-3">
+								<button
+									type="button"
+									className="btn btn-primary btn-soft size-5.5 min-h-0 rounded-sm p-0"
+									onClick={() => {
+										formData.participants > 0 ? setFormData({ ...formData, participants: formData.participants - 2 }) : null;
+									}}>
+									<span className="icon-[tabler--minus] size-3.5 shrink-0"></span>
+								</button>
+								<button
+									type="button"
+									className="btn btn-primary btn-soft size-5.5 min-h-0 rounded-sm p-0"
+									onClick={() => {
+										formData.participants < 16 ? setFormData({ ...formData, participants: formData.participants + 2 }) : null;
+									}}>
+									<span className="icon-[tabler--plus] size-3.5 shrink-0"></span>
+								</button>
+							</span>
+						</div>
+					</div>
+				);
 			default:
 				return null;
 		}

@@ -4,3 +4,4 @@
 @plugin "@midudev/tailwind-animations";
 @plugin "flyonui";
 @source "./node_modules/flyonui/dist/index.js";
+@plugin "@iconify/tailwind4";
