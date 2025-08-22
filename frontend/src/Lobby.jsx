@@ -17,9 +17,9 @@ export const Lobby = () => {
 					</button>
 				</div>
 			) : (
-				<div className="bg-white size-1/2 p-10 rounded-md flex justify-between">
-					<Steps modalFade={modalFade} setModalFade={setModalFade} />
-					<Modal />
+				<div className="h-2/3 w-1/2  p-10 rounded-md flex justify-between animate-fade-in-down bg-gradient-to-tr to-gray-200 from-gray-300">
+					<Steps />
+					<Modal modalFade={modalFade} setModalFade={setModalFade} />
 				</div>
 			)}
 		</>
