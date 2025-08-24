@@ -1,26 +1,44 @@
 import { useState } from "react";
+import Swal from "sweetalert2";
 
 export const Modal = (props) => {
 	const [step, setStep] = useState(1);
 	const [formData, setFormData] = useState({
 		name: "",
 		eventType: "",
-		participants: 0
+		participants: 0,
+		participantsName: []
 	});
 
-	const handleChange = (e) => {
-		setFormData({ ...formData, [e.target.name]: e.target.value });
+	const handleChange = (e, index = null) => {
+		const { name, value } = e.target;
+		if (name === "participantsName" && index !== null) {
+			const updatedParticipants = [...formData.participantsName];
+			updatedParticipants[index] = { id: index + 1, name: value };
+			setFormData({ ...formData, participantsName: updatedParticipants });
+		} else {
+			setFormData({ ...formData, [name]: value });
+		}
 	};
 	const handleNext = () => {
-		if (step < 3) {
+		if (step < 4) {
 			if (step === 1 && formData.name !== "") {
 				setStep(step + 1);
 			} else if (step === 2 && formData.eventType !== "") {
 				setStep(step + 1);
+			} else if (step === 3 && formData.participants > 0) {
+				// inicializamos los slots de participantes vacíos al llegar al paso 4
+				setFormData({
+					...formData,
+					participantsName: Array.from({ length: formData.participants }, () => ({ id: null, name: "" }))
+				});
+				setStep(step + 1);
+			} else {
+				Swal.fire("Falta Información");
 			}
 		} else {
 			console.log("Datos finales:", formData);
-			setFormData({ name: "", eventType: "", participants: "" });
+			setFormData({ name: "", eventType: "", participants: 0, participantsName: [] });
 			setStep(1);
 			props.setModalFade(!props.modalFade);
 		}
@@ -83,11 +101,11 @@ export const Modal = (props) => {
 				);
 			case 3:
 				return (
-					<div className="flex flex-col justify-center items-center gap-2">
+					<div className="flex flex-col justify-center items-center gap-2	">
 						<p>Ahora necesitamos que nos indiques el número de participantes.</p>
 						<span className="font-bold">Numero par entre 2 y 16</span>
 						<div className="input w-1/2">
-							<input type="text" name="participants" value={formData.participants} />
+							<input type="text" name="participants" value={formData.participants} onChange={handleChange} />
 							<span className="my-auto flex gap-3">
 								<button
 									type="button"
@@ -107,6 +125,25 @@ export const Modal = (props) => {
 								</button>
 							</span>
 						</div>
+					</div>
+				);
+			case 4:
+				return (
+					<div className="flex flex-col gap-4 w-full items-center">
+						<p className="font-bold">Ingresa los nombres de los participantes:</p>
+						{Array.from({ length: formData.participants }).map((_, index) => (
+							<div key={index} className="w-1/2">
+								<label className="block text-sm font-medium text-gray-700 mb-1">Participante {index + 1}</label>
+								<input
+									type="text"
+									className="p-2 w-full rounded border border-gray-300 shadow-sm text-black"
+									placeholder={`Nombre del participante ${index + 1}`}
+									name="participantsName"
+									value={formData.participantsName[index]?.name || ""}
+									onChange={(e) => handleChange(e, index)}
+								/>
+							</div>
+						))}
 					</div>
 				);
 			default:
