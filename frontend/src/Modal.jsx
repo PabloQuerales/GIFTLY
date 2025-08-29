@@ -129,21 +129,27 @@ export const Modal = (props) => {
 				);
 			case 4:
 				return (
-					<div className="flex flex-col gap-4 w-full items-center">
-						<p className="font-bold">Ingresa los nombres de los participantes:</p>
-						{Array.from({ length: formData.participants }).map((_, index) => (
-							<div key={index} className="w-1/2">
-								<label className="block text-sm font-medium text-gray-700 mb-1">Participante {index + 1}</label>
-								<input
-									type="text"
-									className="p-2 w-full rounded border border-gray-300 shadow-sm text-black"
-									placeholder={`Nombre del participante ${index + 1}`}
-									name="participantsName"
-									value={formData.participantsName[index]?.name || ""}
-									onChange={(e) => handleChange(e, index)}
-								/>
+					<div className="flex flex-col w-full h-auto">
+						<div className="flex flex-col gap-4 w-full items-center">
+							<p className="font-bold">Ingresa los nombres de los participantes:</p>
+						</div>
+						<div className="flex-1 overflow-y-auto mt-4 pr-2">
+							<div className="grid grid-cols-2 gap-4">
+								{Array.from({ length: formData.participants }).map((_, index) => (
+									<div key={index} className="flex flex-col items-center">
+										<label className="block text-sm font-medium text-gray-700 mb-1">Participante {index + 1}</label>
+										<input
+											type="text"
+											className="p-2 w-full rounded border border-gray-300 shadow-sm text-black"
+											placeholder={`Nombre del participante ${index + 1}`}
+											name="participantsName"
+											value={formData.participantsName?.[index]?.name || ""}
+											onChange={(e) => handleChange(e, index)}
+										/>
+									</div>
+								))}
 							</div>
-						))}
+						</div>
 					</div>
 				);
 			default:
