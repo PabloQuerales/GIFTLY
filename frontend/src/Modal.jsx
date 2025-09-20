@@ -22,8 +22,8 @@ export const Modal = (props) => {
 		}
 	};
 	const handleNext = () => {
-		if (step < 4) {
-			if (step === 1 && formData.name !== "") {
+		if (step < 5) {
+			if (step === 1 && formData.name !== "" && formData.email !== "") {
 				setStep(step + 1);
 			} else if (step === 2 && formData.eventType !== "") {
 				setStep(step + 1);
@@ -34,11 +34,18 @@ export const Modal = (props) => {
 					participantsName: Array.from({ length: formData.participants }, () => ({ id: null, name: "" }))
 				});
 				setStep(step + 1);
+			} else if (step === 4) {
+				const allNamesFilled = formData.participantsName.every((p) => p.name.trim() !== "");
+				if (allNamesFilled) {
+					console.log("Datos finales:", formData);
+					setStep(step + 1);
+				} else {
+					Swal.fire("Falta Información");
+				}
 			} else {
 				Swal.fire("Falta Información");
 			}
 		} else {
-			console.log("Datos finales:", formData);
 			setFormData({ name: "", email: "", eventType: "", participants: 0, participantsName: [] });
 			setStep(1);
 			props.setModalFade(!props.modalFade);
@@ -167,6 +174,26 @@ export const Modal = (props) => {
 						</div>
 					</div>
 				);
+			case 5:
+				return (
+					<div className="flex flex-col justify-center items-center gap-4 p-4">
+						<h2 className="text-xl font-bold text-amber-900">¡Listo, {formData.name || "Participante"}!</h2>
+						<p className="text-center">
+							Hemos enviado la información de tu intercambio a tu correo electrónico.
+							<span className="font-bold">Recuerda revisar también la bandeja de correos no deseados.</span>
+						</p>
+						<p className="text-center">
+							Por favor, <span className="font-bold">no abras invitaciones que no sean tuyas</span> para no afectar la experiencia de los demás.
+							Comparte únicamente las invitaciones con tus amigos o familiares.
+						</p>
+						<button
+							type="button"
+							className="mt-4 rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+							onClick={() => props.setModalFade(!props.modalFade)}>
+							Cerrar
+						</button>
+					</div>
+				);
 			default:
 				return null;
 		}
@@ -181,25 +208,36 @@ export const Modal = (props) => {
 			</div>
 			<div className="flex-1 m-4 overflow-hidden">{renderStepContent()}</div>
 			<footer className="mt-6 flex justify-center gap-2 shrink-0">
-				<button
-					type="button"
-					onClick={handleBack}
-					disabled={step === 1}
-					className="rounded bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed">
-					Atrás
-				</button>
-				<button
-					type="button"
-					className="rounded bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
-					onClick={() => props.setModalFade(!props.modalFade)}>
-					Cancelar
-				</button>
-				<button
-					type="button"
-					onClick={handleNext}
-					className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
-					Continuar
-				</button>
+				{step !== 5 ? (
+					<>
+						<button
+							type="button"
+							onClick={handleBack}
+							disabled={step === 1}
+							className="rounded bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed">
+							Atrás
+						</button>
+						<button
+							type="button"
+							className="rounded bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
+							onClick={() => props.setModalFade(!props.modalFade)}>
+							Cancelar
+						</button>
+						<button
+							type="button"
+							onClick={handleNext}
+							className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
+							Continuar
+						</button>
+					</>
+				) : (
+					<button
+						type="button"
+						className="rounded bg-blue-600 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+						onClick={() => props.setModalFade(!props.modalFade)}>
+						Gracias
+					</button>
+				)}
 			</footer>
 		</div>
 	);
