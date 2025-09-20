@@ -129,11 +129,11 @@ export const Modal = (props) => {
 				);
 			case 4:
 				return (
-					<div className="flex flex-col w-full h-auto">
+					<div className="flex flex-col w-full h-full">
 						<div className="flex flex-col gap-4 w-full items-center">
 							<p className="font-bold">Ingresa los nombres de los participantes:</p>
 						</div>
-						<div className="flex-1 overflow-y-auto mt-4 pr-2">
+						<div className="flex-1 max-h-80 overflow-y-auto mt-4 pr-2">
 							<div className="grid grid-cols-2 gap-4">
 								{Array.from({ length: formData.participants }).map((_, index) => (
 									<div key={index} className="flex flex-col items-center">
@@ -158,14 +158,14 @@ export const Modal = (props) => {
 	};
 
 	return (
-		<div className="w-full text-gray-700 text-sm ms-10 flex flex-col items-center text-center border-l-2 pl-4 justify-between overflow-hidden ">
-			<div className="flex items-start justify-between">
+		<div className="w-full text-gray-700 text-sm ms-10 flex flex-col text-center border-l-2 pl-4 h-full">
+			<div className="flex items-start justify-center">
 				<h2 id="modalTitle" className="text-xl font-bold text-amber-900 sm:text-2xl">
 					Bienvenido a GIFTLY
 				</h2>
 			</div>
-			<div className="mt-4">{renderStepContent()}</div>
-			<footer className="mt-6 flex justify-end gap-2">
+			<div className="flex-1 m-4 overflow-hidden">{renderStepContent()}</div>
+			<footer className="mt-6 flex justify-center gap-2 shrink-0">
 				<button
 					type="button"
 					onClick={handleBack}
@@ -179,7 +179,6 @@ export const Modal = (props) => {
 					onClick={() => props.setModalFade(!props.modalFade)}>
 					Cancelar
 				</button>
-
 				<button
 					type="button"
 					onClick={handleNext}
