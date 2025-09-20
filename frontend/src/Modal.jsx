@@ -5,6 +5,7 @@ export const Modal = (props) => {
 	const [step, setStep] = useState(1);
 	const [formData, setFormData] = useState({
 		name: "",
+		email: "",
 		eventType: "",
 		participants: 0,
 		participantsName: []
@@ -38,7 +39,7 @@ export const Modal = (props) => {
 			}
 		} else {
 			console.log("Datos finales:", formData);
-			setFormData({ name: "", eventType: "", participants: 0, participantsName: [] });
+			setFormData({ name: "", email: "", eventType: "", participants: 0, participantsName: [] });
 			setStep(1);
 			props.setModalFade(!props.modalFade);
 		}
@@ -54,8 +55,8 @@ export const Modal = (props) => {
 					<div className="flex flex-col justify-center items-center">
 						<p className="">Para empezar, te haremos algunas preguntas sencillas que nos ayudarán a crear tu evento de intercambios.</p>
 
-						<label htmlFor="Confirm" className="mt-4 block">
-							<span className="font-bold">¡Comencemos por tu nombre!</span>
+						<label htmlFor="Confirm" className="mt-2 flex flex-col justify-center items-center w-full">
+							<span className="font-bold">Comencemos por tu nombre</span>
 
 							<input
 								type="text"
@@ -63,7 +64,21 @@ export const Modal = (props) => {
 								value={formData.name}
 								onChange={handleChange}
 								required
-								className="mt-4 p-2 w-1/2 rounded border-gray-300 shadow-md sm:text-sm text-black"
+								placeholder="nombre"
+								className="mt-2 p-2 w-1/2 rounded shadow-md sm:text-sm text-black bg-gray-300"
+							/>
+						</label>
+						<label htmlFor="Confirm" className="mt-2 flex flex-col justify-center items-center w-full">
+							<span className="font-bold">Tambien necesitamos un correo electrónico para enviarte las invitaciones.</span>
+
+							<input
+								type="text"
+								name="email"
+								value={formData.email}
+								onChange={handleChange}
+								required
+								placeholder="email"
+								className="mt-2 p-2 w-1/2 rounded shadow-md sm:text-sm text-black bg-gray-300"
 							/>
 						</label>
 					</div>
