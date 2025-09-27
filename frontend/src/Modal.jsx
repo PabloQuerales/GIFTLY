@@ -10,7 +10,31 @@ export const Modal = (props) => {
 		participants: 0,
 		participantsName: []
 	});
+	const sendEmail = async () => {
+		const myHeaders = new Headers();
+		myHeaders.append("Content-Type", "application/json");
 
+		const raw = JSON.stringify({
+			organizer_name: formData.name,
+			organizer_email: formData.email,
+			participantsName: formData.participantsName
+		});
+
+		const requestOptions = {
+			method: "POST",
+			headers: myHeaders,
+			body: raw,
+			redirect: "follow"
+		};
+
+		try {
+			const response = await fetch("http://127.0.0.1:5000/send-invitations", requestOptions);
+			const result = await response.json();
+			console.log(result);
+		} catch (error) {
+			console.error(error);
+		}
+	};
 	const handleChange = (e, index = null) => {
 		const { name, value } = e.target;
 		if (name === "participantsName" && index !== null) {
@@ -38,6 +62,7 @@ export const Modal = (props) => {
 				const allNamesFilled = formData.participantsName.every((p) => p.name.trim() !== "");
 				if (allNamesFilled) {
 					console.log("Datos finales:", formData);
+					sendEmail();
 					setStep(step + 1);
 				} else {
 					Swal.fire("Falta Información");

@@ -1,7 +1,7 @@
 import random
 
-def generate_secret_santa(participants):
-    names = [p["name"] for p in participants]
+def generate_secret_santa(participantsName):
+    names = [p["name"] for p in participantsName]
     receivers = names[:]
 
     # Intentar hasta que nadie se regale a sí mismo

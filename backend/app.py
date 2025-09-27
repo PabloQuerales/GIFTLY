@@ -3,29 +3,32 @@ from config import Config
 from utils.email_sender import mail, send_invitation_email
 from utils.pdf_generator import create_invitation_pdf, protect_pdf
 from utils.santa_logic import generate_secret_santa
+from flask_cors import CORS
+import os
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})
 app.config.from_object(Config)
 mail.init_app(app)
 
 @app.route('/send-invitations', methods=['POST'])
 def send_invitations():
     data = request.get_json()
-    participants = data.get("participants", [])
+    participantsName = data.get("participantsName", [])
     organizer_email = data.get("organizer_email")
     organizer_name = data.get("organizer_name")
 
-    if not participants or len(participants) < 2:
+    if not participantsName or len(participantsName) < 2:
         return jsonify({"error": "Se necesitan al menos 2 participantes"}), 400
 
     if not organizer_email:
         return jsonify({"error": "Se necesita un correo electrónico del organizador"}), 400
 
     # 🔀 Generar sorteo seguro
-    pairs = generate_secret_santa(participants)
+    pairs = generate_secret_santa(participantsName)
 
     pdf_buffers = []
-    for participant in participants:
+    for participant in participantsName:
         name = participant["name"]
         receiver = pairs[name]
 
