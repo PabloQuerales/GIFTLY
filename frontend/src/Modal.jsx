@@ -61,14 +61,19 @@ export const Modal = (props) => {
 			} else if (step === 4) {
 				const allNamesFilled = formData.participantsName.every((p) => p.name.trim() !== "");
 				if (allNamesFilled) {
-					console.log("Datos finales:", formData);
 					sendEmail();
 					setStep(step + 1);
 				} else {
-					Swal.fire("Falta Información");
+					Swal.fire({
+						title: "Falta Información",
+						confirmButtonColor: "#FF6B6B"
+					});
 				}
 			} else {
-				Swal.fire("Falta Información");
+				Swal.fire({
+					title: "Falta Información",
+					confirmButtonColor: "#FF6B6B"
+				});
 			}
 		} else {
 			setFormData({ name: "", email: "", eventType: "", participants: 0, participantsName: [] });
@@ -227,8 +232,8 @@ export const Modal = (props) => {
 	return (
 		<div className="w-full text-gray-700 text-sm ms-10 flex flex-col text-center border-l-2 pl-4 h-full">
 			<div className="flex items-start justify-center">
-				<h2 id="modalTitle" className="text-xl font-bold text-amber-900 sm:text-2xl">
-					Bienvenido a GIFTLY
+				<h2 id="modalTitle" className="text-xl font-bold text-[#FF6B6B] sm:text-2xl">
+					Bienvenido a Giftly
 				</h2>
 			</div>
 			<div className="flex-1 m-4 overflow-hidden">{renderStepContent()}</div>
@@ -251,14 +256,14 @@ export const Modal = (props) => {
 						<button
 							type="button"
 							onClick={handleNext}
-							className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
+							className="rounded bg-[#FF6B6B] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-300">
 							Continuar
 						</button>
 					</>
 				) : (
 					<button
 						type="button"
-						className="rounded bg-blue-600 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+						className="rounded bg-[#FF6B6B] px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-red-300"
 						onClick={() => props.setModalFade(!props.modalFade)}>
 						Gracias
 					</button>
