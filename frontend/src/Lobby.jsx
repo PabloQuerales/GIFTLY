@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Steps } from "./Steps";
 import { Modal } from "./Modal";
+import logo from "../src/assets/logo.png";
 
 export const Lobby = () => {
 	const [modalFade, setModalFade] = useState(false);
@@ -8,7 +9,7 @@ export const Lobby = () => {
 		<>
 			{!modalFade ? (
 				<div className="text-white flex justify-center items-center flex-col">
-					<h1>GIFTLY</h1>
+					<img src={logo} className="w-50 absolute top-30" />
 					<p> Portar diseñado para generar de manera aleatoria y personalizada sorteos para intercambios secretos</p>
 					<button
 						onClick={() => setModalFade(!modalFade)}
