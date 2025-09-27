@@ -9,11 +9,11 @@ export const Lobby = () => {
 		<>
 			{!modalFade ? (
 				<div className="text-white flex justify-center items-center flex-col">
-					<img src={logo} className="w-50 absolute top-30" />
+					<img src={logo} className="w-80 absolute top-10 logo-giftly-sombra" />
 					<p> Portar diseñado para generar de manera aleatoria y personalizada sorteos para intercambios secretos</p>
 					<button
 						onClick={() => setModalFade(!modalFade)}
-						className="text-black mt-10 font-bold w-34 h-10 text-xs rounded-xl bg-amber-100 cursor-pointer hover:scale-105 transition transform hover:bg-amber-200">
+						className="text-black mt-10 font-bold w-34 h-10 text-xs rounded-xl bg-[#FF6B6B] cursor-pointer hover:scale-105 transition transform hover:bg-amber-200">
 						CREAR UN EVENTO
 					</button>
 				</div>
