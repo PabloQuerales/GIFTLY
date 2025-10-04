@@ -126,13 +126,13 @@ export const Modal = (props) => {
 						<p>
 							<span className="font-bold">{formData.name}</span> que tipo de intercambio estás pensando llevar a cabo?
 						</p>
-						<div className="flex size-full items-start gap-3 flex-wrap sm:flex-nowrap justify-center mt-4">
+						<div className="flex size-full items-start gap-3 flex-wrap sm:flex-nowrap justify-center">
 							<label className="custom-option text-center flex w-1/2 h-full flex-col items-center gap-3 ">
 								<div className="flex flex-col">
 									<span className=" mb-1 font-bold text-amber-900">Familiar</span>
 									<span className="text-xs">Ideal para reuniones de intercambio mas informales, como navidades entre amigos y/o familia. </span>
 									<span className="font-bold text-xs">
-										Invitados recomendados <br /> entre 4 y 16
+										Invitados recomendados <br /> entre 3 y 20
 									</span>
 								</div>
 								<input type="checkbox" name="eventType" value="family" onClick={handleChange} className="checkbox checkbox-primary" />
@@ -155,7 +155,7 @@ export const Modal = (props) => {
 				return (
 					<div className="flex flex-col justify-center items-center gap-2	">
 						<p>Ahora necesitamos que nos indiques el número de participantes.</p>
-						<span className="font-bold">Numero par entre 2 y 16</span>
+						<span className="font-bold">Numero entre 3 y 20</span>
 						<div className="input w-1/2">
 							<input type="text" name="participants" value={formData.participants} onChange={handleChange} />
 							<span className="my-auto flex gap-3">
