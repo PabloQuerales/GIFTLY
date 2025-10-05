@@ -163,7 +163,7 @@ export const Modal = (props) => {
 									type="button"
 									className="btn btn-primary btn-soft size-5.5 min-h-0 rounded-sm p-0"
 									onClick={() => {
-										formData.participants > 0 ? setFormData({ ...formData, participants: formData.participants - 2 }) : null;
+										formData.participants > 0 ? setFormData({ ...formData, participants: formData.participants - 1 }) : null;
 									}}>
 									<span className="icon-[tabler--minus] size-3.5 shrink-0"></span>
 								</button>
@@ -171,7 +171,7 @@ export const Modal = (props) => {
 									type="button"
 									className="btn btn-primary btn-soft size-5.5 min-h-0 rounded-sm p-0"
 									onClick={() => {
-										formData.participants < 16 ? setFormData({ ...formData, participants: formData.participants + 2 }) : null;
+										formData.participants < 20 ? setFormData({ ...formData, participants: formData.participants + 1 }) : null;
 									}}>
 									<span className="icon-[tabler--plus] size-3.5 shrink-0"></span>
 								</button>
