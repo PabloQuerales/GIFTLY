@@ -135,7 +135,7 @@ export const Modal = (props) => {
 										Invitados recomendados <br /> entre 3 y 20
 									</span>
 								</div>
-								<input type="checkbox" name="eventType" value="family" onClick={handleChange} className="checkbox checkbox-primary" />
+								<input type="checkbox" name="eventType" value="family" onClick={handleChange} className="checkbox checkbox-secondary" />
 							</label>
 							<label className="custom-option text-center flex w-1/2 flex-col items-center gap-3 text-gray-400 cursor-no-drop">
 								<span className="flex flex-col">
