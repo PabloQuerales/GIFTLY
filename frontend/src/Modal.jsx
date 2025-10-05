@@ -8,7 +8,9 @@ export const Modal = (props) => {
 		email: "",
 		eventType: "",
 		participants: 0,
-		participantsName: []
+		participantsName: [],
+		location: "",
+		eventName: ""
 	});
 	const sendEmail = async () => {
 		const myHeaders = new Headers();
@@ -76,7 +78,7 @@ export const Modal = (props) => {
 				});
 			}
 		} else {
-			setFormData({ name: "", email: "", eventType: "", participants: 0, participantsName: [] });
+			setFormData({ name: "", email: "", eventType: "", participants: 0, participantsName: [], location: "", eventName: "" });
 			setStep(1);
 			props.setModalFade(!props.modalFade);
 		}
@@ -109,7 +111,7 @@ export const Modal = (props) => {
 							<span className="font-bold">Tambien necesitamos un correo electrónico para enviarte las invitaciones.</span>
 
 							<input
-								type="text"
+								type="email"
 								name="email"
 								value={formData.email}
 								onChange={handleChange}
@@ -154,28 +156,57 @@ export const Modal = (props) => {
 			case 3:
 				return (
 					<div className="flex flex-col justify-center items-center gap-2	">
-						<p>Ahora necesitamos que nos indiques el número de participantes.</p>
-						<span className="font-bold">Numero entre 3 y 20</span>
-						<div className="mt-2 p-2 w-1/2 rounded shadow-md sm:text-sm text-black bg-gray-300 flex">
-							<input type="text" name="participants" value={formData.participants} onChange={handleChange} />
-							<span className="my-auto flex gap-3">
-								<button
-									type="button"
-									className="btn size-5.5 min-h-0 rounded-sm p-0"
-									onClick={() => {
-										formData.participants > 0 ? setFormData({ ...formData, participants: formData.participants - 1 }) : null;
-									}}>
-									<span className="icon-[tabler--minus] size-3.5 shrink-0"></span>
-								</button>
-								<button
-									type="button"
-									className="btn size-5.5 min-h-0 rounded-sm p-0"
-									onClick={() => {
-										formData.participants < 20 ? setFormData({ ...formData, participants: formData.participants + 1 }) : null;
-									}}>
-									<span className="icon-[tabler--plus] size-3.5 shrink-0"></span>
-								</button>
-							</span>
+						<div>
+							<p>Cual es el nombre del evento y donde se realizará?</p>
+							<label htmlFor="Confirm" className="mt-2 flex flex-col justify-center items-center w-full">
+								<input
+									type="text"
+									name="eventName"
+									value={formData.eventName}
+									onChange={handleChange}
+									required
+									placeholder="Nombre del Evento"
+									className="mt-2 p-2 w-1/2 rounded shadow-md sm:text-sm text-black bg-gray-300"
+								/>
+							</label>
+							<label htmlFor="Confirm" className="mt-2 flex flex-col justify-center items-center w-full">
+								<input
+									type="text"
+									name="location"
+									value={formData.location}
+									onChange={handleChange}
+									required
+									placeholder="Lugar o dirección del evento "
+									className="mt-2 p-2 w-1/2 rounded shadow-md sm:text-sm text-black bg-gray-300"
+								/>
+							</label>
+						</div>
+						<div>
+							<p>Ahora necesitamos que nos indiques el número de participantes.</p>
+							<span className="font-bold">Numero entre 3 y 20</span>
+							<div className="w-full flex justify-center ">
+								<div className="mt-2 p-2 w-1/2 rounded shadow-md sm:text-sm text-black bg-gray-300 flex justify-center">
+									<input type="text" name="participants" value={formData.participants} onChange={handleChange} />
+									<span className="my-auto flex gap-3">
+										<button
+											type="button"
+											className="btn size-5.5 min-h-0 rounded-sm p-0"
+											onClick={() => {
+												formData.participants > 0 ? setFormData({ ...formData, participants: formData.participants - 1 }) : null;
+											}}>
+											<span className="icon-[tabler--minus] size-3.5 shrink-0"></span>
+										</button>
+										<button
+											type="button"
+											className="btn size-5.5 min-h-0 rounded-sm p-0"
+											onClick={() => {
+												formData.participants < 20 ? setFormData({ ...formData, participants: formData.participants + 1 }) : null;
+											}}>
+											<span className="icon-[tabler--plus] size-3.5 shrink-0"></span>
+										</button>
+									</span>
+								</div>
+							</div>
 						</div>
 					</div>
 				);
