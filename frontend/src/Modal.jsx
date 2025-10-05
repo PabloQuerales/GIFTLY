@@ -156,12 +156,12 @@ export const Modal = (props) => {
 					<div className="flex flex-col justify-center items-center gap-2	">
 						<p>Ahora necesitamos que nos indiques el número de participantes.</p>
 						<span className="font-bold">Numero entre 3 y 20</span>
-						<div className="input w-1/2">
+						<div className="mt-2 p-2 w-1/2 rounded shadow-md sm:text-sm text-black bg-gray-300 flex">
 							<input type="text" name="participants" value={formData.participants} onChange={handleChange} />
 							<span className="my-auto flex gap-3">
 								<button
 									type="button"
-									className="btn btn-primary btn-soft size-5.5 min-h-0 rounded-sm p-0"
+									className="btn size-5.5 min-h-0 rounded-sm p-0"
 									onClick={() => {
 										formData.participants > 0 ? setFormData({ ...formData, participants: formData.participants - 1 }) : null;
 									}}>
@@ -169,7 +169,7 @@ export const Modal = (props) => {
 								</button>
 								<button
 									type="button"
-									className="btn btn-primary btn-soft size-5.5 min-h-0 rounded-sm p-0"
+									className="btn size-5.5 min-h-0 rounded-sm p-0"
 									onClick={() => {
 										formData.participants < 20 ? setFormData({ ...formData, participants: formData.participants + 1 }) : null;
 									}}>
