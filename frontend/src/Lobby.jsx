@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Steps } from "./Steps";
 import { Modal } from "./Modal";
 import logo from "../src/assets/logo.png";
+import miniLogo from "../src/assets/g-logo.png";
+import relleno from "../src/assets/decor.png";
 
 export const Lobby = () => {
 	const [modalFade, setModalFade] = useState(false);
@@ -22,9 +24,9 @@ export const Lobby = () => {
 			) : (
 				<div className="flex justify-center  items-center size-full overflow-hidden">
 					<a href="/">
-						<img src="./src/assets/g-logo.png" alt="logo-giftly" className="absolute top-5 left-5 size-20 animate-fade-in-down" />
+						<img src={miniLogo} alt="logo-giftly" className="absolute top-5 left-5 size-20 animate-fade-in-down" />
 					</a>
-					<img src="./src/assets/decor.png" alt="logo-giftly" className="absolute animate-fade-in-down -right-15 -bottom-12 size-100 " />
+					<img src={relleno} alt="logo-giftly" className="absolute animate-fade-in-down -right-15 -bottom-12 size-100 " />
 					<div className="h-2/3 w-1/2  p-10 rounded-md flex justify-between animate-fade-in-down bg-gradient-to-tr to-gray-200 from-gray-300">
 						<Steps />
 						<Modal modalFade={modalFade} setModalFade={setModalFade} />
