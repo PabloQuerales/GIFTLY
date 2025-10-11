@@ -15,7 +15,6 @@ mail.init_app(app)
 
 logging.basicConfig(level=logging.INFO)
 
-
 @app.route('/send-invitations', methods=['POST'])
 def send_invitations():
     try:
