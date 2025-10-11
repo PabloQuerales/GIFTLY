@@ -7,7 +7,6 @@ from flask_cors import CORS
 import json
 import logging
 import traceback
-import base64
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -16,10 +15,6 @@ mail.init_app(app)
 
 logging.basicConfig(level=logging.INFO)
 
-with open("static/logo.png", "rb") as image_file:
-    encoded_logo = base64.b64encode(image_file.read()).decode()
-
-logo_html = f'<img src="data:image/png;base64,{encoded_logo}" alt="Giftly" style="width:120px; height:auto; margin-bottom:20px;">'
 
 @app.route('/send-invitations', methods=['POST'])
 def send_invitations():
@@ -136,7 +131,6 @@ def send_invitations():
         </head>
         <body>
         <div class="container">
-            {logo_html}
             <h1>Hola {organizer_name}!</h1>
             <p>Tu evento <strong>{event_name}</strong> está listo 🎉</p>
             <p>
@@ -155,8 +149,7 @@ def send_invitations():
             </ul>
 
             <p>
-                <strong>Lugar:</strong> {location}
-            </p>
+                <strong>Lugar:</strong> {location} · <strong>Tipo:</strong> {event_type or 'No especificado'}</p>
             <p>
                 Una vez que todos reciban su invitación, podrán descubrir a quién deben regalar.
             </p>
