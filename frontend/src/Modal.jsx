@@ -37,7 +37,7 @@ export const Modal = (props) => {
 		try {
 			const response = await fetch(`${backendURL}/send-invitations`, requestOptions);
 			const result = await response.json();
-			console.log(result);
+			// console.log(result);
 		} catch (error) {
 			console.error(error);
 		}
