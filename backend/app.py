@@ -9,14 +9,30 @@ import logging
 import traceback
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+
+@app.after_request
+def after_request(response):
+    """
+    Agrega cabeceras CORS necesarias para que los navegadores no bloqueen el preflight.
+    """
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
+    response.headers.add("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+    return response
+
 app.config.from_object(Config)
 mail.init_app(app)
 
 logging.basicConfig(level=logging.INFO)
 
-@app.route('/send-invitations', methods=['POST'])
+@app.route('/send-invitations', methods=['POST', 'OPTIONS'])
 def send_invitations():
+    # ✅ Responder al preflight OPTIONS antes del POST real
+    if request.method == "OPTIONS":
+        return jsonify({"status": "ok"}), 200
+
     try:
         data = request.get_json(silent=True)
         if data is None:
@@ -75,7 +91,7 @@ def send_invitations():
             protected_pdf = protect_pdf(pdf, password=name)
             pdf_buffers.append((f"Invitacion_{name}.pdf", protected_pdf))
 
-        # Mantener el mismo HTML y estilos que tenías antes
+        # HTML del correo
         html_template = f"""
         <!DOCTYPE html>
         <html>
@@ -148,7 +164,8 @@ def send_invitations():
             </ul>
 
             <p>
-                <strong>Lugar:</strong> {location} · <strong>Tipo:</strong> {event_type or 'No especificado'}</p>
+                <strong>Lugar:</strong> {location} · <strong>Tipo:</strong> {event_type or 'No especificado'}
+            </p>
             <p>
                 Una vez que todos reciban su invitación, podrán descubrir a quién deben regalar.
             </p>

@@ -26,7 +26,6 @@ export const Modal = (props) => {
 			location: formData.location,
 			event_type: formData.eventType
 		});
-
 		const requestOptions = {
 			method: "POST",
 			headers: myHeaders,
@@ -37,7 +36,6 @@ export const Modal = (props) => {
 		try {
 			const response = await fetch(`${backendURL}/send-invitations`, requestOptions);
 			const result = await response.json();
-			// console.log(result);
 		} catch (error) {
 			console.error(error);
 		}
@@ -69,7 +67,6 @@ export const Modal = (props) => {
 				const allNamesFilled = formData.participantsName.every((p) => p.name.trim() !== "");
 				if (allNamesFilled) {
 					sendEmail();
-					console.log(formData);
 					setStep(step + 1);
 				} else {
 					Swal.fire({
