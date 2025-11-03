@@ -2,6 +2,8 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 
 export const Modal = (props) => {
+	const backendURL = import.meta.env.VITE_BACKEND_URL;
+
 	const [step, setStep] = useState(1);
 	const [formData, setFormData] = useState({
 		name: "",
@@ -19,9 +21,11 @@ export const Modal = (props) => {
 		const raw = JSON.stringify({
 			organizer_name: formData.name,
 			organizer_email: formData.email,
-			participantsName: formData.participantsName
+			participantsName: formData.participantsName,
+			event_name: formData.eventName,
+			location: formData.location,
+			event_type: formData.eventType
 		});
-
 		const requestOptions = {
 			method: "POST",
 			headers: myHeaders,
@@ -30,9 +34,8 @@ export const Modal = (props) => {
 		};
 
 		try {
-			const response = await fetch("http://127.0.0.1:5000/send-invitations", requestOptions);
+			const response = await fetch(`${backendURL}/send-invitations`, requestOptions);
 			const result = await response.json();
-			console.log(result);
 		} catch (error) {
 			console.error(error);
 		}

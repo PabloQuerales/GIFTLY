@@ -4,50 +4,96 @@ from utils.email_sender import mail, send_invitation_email
 from utils.pdf_generator import create_invitation_pdf, protect_pdf
 from utils.santa_logic import generate_secret_santa
 from flask_cors import CORS
-import os
+import json
+import logging
+import traceback
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+
+@app.after_request
+def after_request(response):
+    """
+    Agrega cabeceras CORS necesarias para que los navegadores no bloqueen el preflight.
+    """
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
+    response.headers.add("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+    return response
+
 app.config.from_object(Config)
 mail.init_app(app)
 
-@app.route('/send-invitations', methods=['POST'])
+logging.basicConfig(level=logging.INFO)
+
+@app.route('/send-invitations', methods=['POST', 'OPTIONS'])
 def send_invitations():
-    data = request.get_json()
-    participantsName = data.get("participantsName", [])
-    organizer_email = data.get("organizer_email")
-    organizer_name = data.get("organizer_name")
+    # ✅ Responder al preflight OPTIONS antes del POST real
+    if request.method == "OPTIONS":
+        return jsonify({"status": "ok"}), 200
 
-    if not participantsName or len(participantsName) < 2:
-        return jsonify({"error": "Se necesitan al menos 2 participantes"}), 400
+    try:
+        data = request.get_json(silent=True)
+        if data is None:
+            return jsonify({"error": "Request must be JSON and Content-Type: application/json"}), 400
 
-    if not organizer_email:
-        return jsonify({"error": "Se necesita un correo electrónico del organizador"}), 400
+        # Extraer campos
+        participantsName = data.get("participantsName", [])
+        organizer_email = data.get("organizer_email")
+        organizer_name = data.get("organizer_name")
+        event_name = data.get("event_name", "Evento Giftly")
+        location = data.get("location", "Lugar no especificado")
+        event_type = data.get("event_type", None)
+        min_amount = data.get("min_amount", 20)  # opcional
 
-    # 🔀 Generar sorteo seguro
-    pairs = generate_secret_santa(participantsName)
+        # Robustez: si participantsName llegó como string JSON
+        if isinstance(participantsName, str):
+            try:
+                participantsName = json.loads(participantsName)
+            except Exception:
+                return jsonify({"error": "participantsName debe ser un array JSON o lista de objetos"}), 400
 
-    pdf_buffers = []
-    for participant in participantsName:
-        name = participant["name"]
-        receiver = pairs[name]
+        # Validaciones
+        if not isinstance(participantsName, list) or len(participantsName) < 2:
+            return jsonify({"error": "Se necesitan al menos 2 participantes en participantsName"}), 400
 
-        # Crear PDF
-        pdf = create_invitation_pdf(
-            name=name,
-            receiver=receiver,
-            event_name="Evento familiar de intercambio de Navidad 🎄",
-            location="Casa de los abuelos",
-            min_amount=20
-        )
+        if not organizer_email:
+            return jsonify({"error": "Se necesita un correo electrónico del organizador (organizer_email)"}), 400
 
-        # Proteger PDF con contraseña = nombre del participante
-        protected_pdf = protect_pdf(pdf, password=name)
-        pdf_buffers.append((f"Invitacion_{name}.pdf", protected_pdf))
+        # Normalizar: asegurar que cada participante tenga 'name'
+        normalized = []
+        for idx, p in enumerate(participantsName):
+            if isinstance(p, dict) and "name" in p and p["name"]:
+                normalized.append({"name": str(p["name"]), "id": p.get("id")})
+            else:
+                return jsonify({"error": f"Cada participante debe ser un objeto con clave 'name' (error en índice {idx})"}), 400
 
-    # HTML del correo
-    html_template = f"""
-    <!DOCTYPE html>
+        participantsName = normalized
+
+        # Generar sorteo seguro
+        pairs = generate_secret_santa(participantsName)
+
+        # Crear PDFs y protegerlos
+        pdf_buffers = []
+        for participant in participantsName:
+            name = participant["name"]
+            receiver = pairs[name]
+
+            pdf = create_invitation_pdf(
+                name=name,
+                receiver=receiver,
+                event_name=event_name,
+                location=location,
+                min_amount=min_amount
+            )
+
+            protected_pdf = protect_pdf(pdf, password=name)
+            pdf_buffers.append((f"Invitacion_{name}.pdf", protected_pdf))
+
+        # HTML del correo
+        html_template = f"""
+        <!DOCTYPE html>
         <html>
         <head>
         <meta charset="UTF-8">
@@ -101,7 +147,7 @@ def send_invitations():
         <body>
         <div class="container">
             <h1>Hola {organizer_name}!</h1>
-            <p>Tu evento está listo 🎉</p>
+            <p>Tu evento <strong>{event_name}</strong> está listo 🎉</p>
             <p>
                 Adjunto a este correo encontrarás las invitaciones en formato PDF para cada uno de los participantes.
                 Ahora te corresponde a ti, como organizador, hacerles llegar sus respectivas invitaciones.
@@ -118,6 +164,9 @@ def send_invitations():
             </ul>
 
             <p>
+                <strong>Lugar:</strong> {location}
+            </p>
+            <p>
                 Una vez que todos reciban su invitación, podrán descubrir a quién deben regalar.
             </p>
             <p>Te deseamos mucho éxito con tu evento y esperamos que todos lo disfruten.🎁</p>
@@ -128,17 +177,22 @@ def send_invitations():
         </div>
         </body>
         </html>
-            """
+        """
 
-# Enviar un único correo al organizador con TODOS los PDFs adjuntos
-    send_invitation_email(
-        recipients=[organizer_email],
-        subject="Invitaciones Giftly 🎁",
-        body_html=html_template,
-        attachments=pdf_buffers  # 👈 ahora pasamos la lista de (filename, pdf_buffer)
-    )
+        # Enviar correo al organizador con todos los PDFs adjuntos
+        send_invitation_email(
+            recipients=[organizer_email],
+            subject=f"Invitaciones Giftly 🎁 - {event_name}",
+            body_html=html_template,
+            attachments=pdf_buffers
+        )
 
-    return jsonify({"status": "success", "sent_to": organizer_email}), 200
+        return jsonify({"status": "success", "sent_to": organizer_email, "count": len(pdf_buffers)}), 200
+
+    except Exception as e:
+        logging.error("Error en /send-invitations: %s", traceback.format_exc())
+        return jsonify({"error": "Error interno del servidor", "details": str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True)
