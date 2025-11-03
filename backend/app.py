@@ -164,7 +164,7 @@ def send_invitations():
             </ul>
 
             <p>
-                <strong>Lugar:</strong> {location} · <strong>Tipo:</strong> {event_type or 'No especificado'}
+                <strong>Lugar:</strong> {location}
             </p>
             <p>
                 Una vez que todos reciban su invitación, podrán descubrir a quién deben regalar.
