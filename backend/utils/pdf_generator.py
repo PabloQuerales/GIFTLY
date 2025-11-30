@@ -64,7 +64,7 @@ def create_invitation_pdf(name, receiver, event_name, location, min_amount,organ
     # --- Bloque de Información ---
 
     # Título principal (Evento)
-    c.setFont("Helvetica-Bold", 38) # Fuente más grande
+    c.setFont("Helvetica-Bold", 40) # Fuente más grande
     c.setFillColor(COLOR_PRIMARY)
     c.drawCentredString(width / 2, height - 3.5 * cm, f"{name}") 
 
