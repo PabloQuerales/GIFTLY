@@ -193,7 +193,10 @@ def send_invitations():
     except Exception as e:
         logging.error("Error en /send-invitations: %s", traceback.format_exc())
         return jsonify({"error": "Error interno del servidor", "details": str(e)}), 500
-
+    
+@app.route("/ping")
+def ping():
+    return "pong", 200
 
 if __name__ == "__main__":
     app.run(debug=True)
