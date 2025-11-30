@@ -6,8 +6,8 @@ import io
 import random
 
 # TAMAÑO REDISEÑADO: A5 (595 x 420 puntos)
-A5_HORIZONTAL = (595.27, 419.53) 
-POSTCARD = A5_HORIZONTAL
+A5_VERTICAL = (419.53, 350 ) 
+POSTCARD = A5_VERTICAL
 
 # Definimos nuestra paleta de colores para consistencia
 COLOR_PRIMARY = colors.HexColor("#ff6f61") # Rojo/Coral
@@ -18,7 +18,7 @@ COLOR_TEXT_DARK = colors.HexColor("#333333") # Texto oscuro
 # RUTA DEL LOGO (CORREGIDA para ser accedida desde app.py)
 LOGO_PATH = "utils/g-logo.png"
 
-def create_invitation_pdf(name, receiver, event_name, location, min_amount):
+def create_invitation_pdf(name, receiver, event_name, location, min_amount,organizer_name):
     """
     Genera una invitación en formato A5 (Media Carta), elegante y ampliada.
     """
@@ -48,8 +48,8 @@ def create_invitation_pdf(name, receiver, event_name, location, min_amount):
     
     # 🌟 DIBUJAR EL LOGO (Posición ajustada al nuevo tamaño)
     try:
-        LOGO_WIDTH = 3.0 * cm  # <-- Nuevo Ancho: 4.0 cm
-        LOGO_HEIGHT = 7.0 * cm # <-- Altura inicial (puedes dejar esta o ajustarla si quieres forzar un tamaño)
+        LOGO_WIDTH = 2.0 * cm  # <-- Nuevo Ancho: 4.0 cm
+        LOGO_HEIGHT = 6.0 * cm # <-- Altura inicial (puedes dejar esta o ajustarla si quieres forzar un tamaño)
         ADJUSTMENT =  2.0 * cm
         X_POS = 0.8 * cm 
         Y_POS = height - 1.0 * cm - LOGO_HEIGHT + ADJUSTMENT 
@@ -64,14 +64,14 @@ def create_invitation_pdf(name, receiver, event_name, location, min_amount):
     # --- Bloque de Información ---
 
     # Título principal (Evento)
-    c.setFont("Helvetica", 14) # Fuente más grande
-    c.setFillColor(COLOR_TEXT_DARK)
-    c.drawCentredString(width / 2, height - 2.5 * cm, "Invitación al Intercambio de Regalos") 
+    c.setFont("Helvetica-Bold", 38) # Fuente más grande
+    c.setFillColor(COLOR_PRIMARY)
+    c.drawCentredString(width / 2, height - 3.5 * cm, f"{name}") 
 
     # Nombre del invitado (Protagonista)
-    c.setFont("Helvetica-Bold", 30) # Fuente más grande
-    c.setFillColor(COLOR_PRIMARY)
-    c.drawCentredString(width / 2, height - 4.2 * cm, f"{name}")
+    c.setFont("Helvetica", 12) # Fuente más grande
+    c.setFillColor(COLOR_TEXT_DARK)
+    c.drawCentredString(width / 2, height - 4.3 * cm, f"Has sido invitado/a por {organizer_name} a un intercambio de regalos ")
     
     # Línea separadora centrada
     c.setStrokeColor(COLOR_PRIMARY)
@@ -81,36 +81,40 @@ def create_invitation_pdf(name, receiver, event_name, location, min_amount):
 
     # --- Detalles del Evento (Izquierda) ---
     
-    Y_START_DETAIL = height - 7.5 * cm # Punto de inicio movido hacia abajo
+    Y_START_DETAIL = height - 6.2 * cm # Punto de inicio movido hacia abajo
 
-    c.setFont("Helvetica-Bold", 12)
+    c.setFont("Helvetica-Bold", 9)
     c.setFillColor(COLOR_TEXT_DARK)
-    c.drawString(2.0 * cm, Y_START_DETAIL, "Detalles del Evento:")
+    c.drawString(2 * cm, Y_START_DETAIL, "Te contamos más:")
+    c.drawString(2 * cm, Y_START_DETAIL - 1 * cm, f"{event_name}")
+    c.drawString(2 * cm, Y_START_DETAIL - 2 * cm, f"{location}")
+    c.drawString(2 * cm, Y_START_DETAIL - 3 * cm, f"{min_amount}€")
     
-    c.setFont("Helvetica", 11)
-    c.drawString(2.0 * cm, Y_START_DETAIL - 1.0 * cm, f"Evento: {event_name}")
-    c.drawString(2.0 * cm, Y_START_DETAIL - 1.8 * cm, f"Lugar: {location}")
-    c.drawString(2.0 * cm, Y_START_DETAIL - 2.6 * cm, f"Mínimo a gastar: {min_amount}€")
+    c.setFont("Helvetica", 9)
+    c.drawString(2 * cm, Y_START_DETAIL - 0.5 * cm, f"El motivo es:")
+    c.drawString(2 * cm, Y_START_DETAIL - 1.5 * cm, f"Será en:")
+    c.drawString(2 * cm, Y_START_DETAIL - 2.5 * cm, f"El monto máximo del regalo:")
+
 
     # --- Receptor del Regalo (Derecha - Mayor Énfasis) ---
     
     # Recuadro de destaque para el receptor (Ajustado al nuevo tamaño)
     BOX_WIDTH = 6.0 * cm
     BOX_HEIGHT = 3.5 * cm
-    X_BOX_START = width - 2.0 * cm - BOX_WIDTH
-    Y_BOX_START = Y_START_DETAIL - BOX_HEIGHT + 1.0 * cm
+    X_BOX_START = width - 1 * cm - BOX_WIDTH
+    Y_BOX_START = Y_START_DETAIL - BOX_HEIGHT + 0.3 * cm
     
     # Fondo suave del recuadro
-    c.setFillColor(COLOR_ACCENT)
-    c.rect(X_BOX_START, Y_BOX_START, BOX_WIDTH, BOX_HEIGHT, stroke=0, fill=1)
+    c.setStrokeColor(COLOR_ACCENT)
+    c.rect(X_BOX_START, Y_BOX_START, BOX_WIDTH, BOX_HEIGHT, stroke=1, fill=0)
     
     # Título del Recuadro
-    c.setFont("Helvetica", 11)
+    c.setFont("Helvetica-Bold", 12)
     c.setFillColor(COLOR_TEXT_DARK)
-    c.drawCentredString(X_BOX_START + BOX_WIDTH/2, Y_BOX_START + BOX_HEIGHT - 0.7 * cm, "¡Tu Destinatario Es!")
+    c.drawCentredString(X_BOX_START + BOX_WIDTH/2, Y_BOX_START + BOX_HEIGHT - 0.7 * cm, "Te tocó regalarle a:")
 
     # Nombre del Receptor 
-    c.setFont("Helvetica-Bold", 24) # Fuente más grande e impactante
+    c.setFont("Helvetica-Bold", 38) # Fuente más grande e impactante
     c.setFillColor(COLOR_PRIMARY) 
     c.drawCentredString(X_BOX_START + BOX_WIDTH/2, Y_BOX_START + 1.2 * cm, f"{receiver}")
 

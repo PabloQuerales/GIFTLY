@@ -85,7 +85,8 @@ def send_invitations():
                 receiver=receiver,
                 event_name=event_name,
                 location=location,
-                min_amount=min_amount
+                min_amount=min_amount,
+                organizer_name=organizer_name
             )
 
             protected_pdf = protect_pdf(pdf, password=name)
