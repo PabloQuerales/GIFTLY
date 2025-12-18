@@ -7,25 +7,12 @@ from flask_cors import CORS
 import json
 import logging
 import traceback
+import os
 
 app = Flask(__name__)
 
-CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
-
-@app.after_request
-def after_request(response):
-    """
-    Agrega cabeceras CORS necesarias para que los navegadores no bloqueen el preflight.
-    """
-    response.headers.add("Access-Control-Allow-Origin", "*")
-    response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
-    response.headers.add("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
-    return response
-
-app.config.from_object(Config)
-mail.init_app(app)
-
-logging.basicConfig(level=logging.INFO)
+cors_origins = os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:5173,https://giftly-zeta.vercel.app").split(",")
+CORS(app, supports_credentials=True, origins=cors_origins)
 
 @app.route('/send-invitations', methods=['POST', 'OPTIONS'])
 def send_invitations():
