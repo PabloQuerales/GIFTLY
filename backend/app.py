@@ -11,8 +11,21 @@ import os
 
 app = Flask(__name__)
 
-cors_origins = os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:5173,https://giftly-zeta.vercel.app").split(",")
-CORS(app, supports_credentials=True, origins=cors_origins)
+# 1. CORRECCIÓN CLAVE: No usar "*" si usas supports_credentials=True.
+# En su lugar, lee los orígenes de una variable de entorno.
+allowed_origins = os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:5173,https://giftly-zeta.vercel.app").split(",")
+
+CORS(app, origins=allowed_origins, supports_credentials=True)
+
+# 2. ELIMINAR: El bloque @app.after_request debe ser eliminado.
+# La extensión CORS ya se encarga de inyectar las cabeceras correctamente. 
+# Si dejas ambos, las cabeceras se duplican y el navegador rechaza la petición.
+
+# El resto de tu configuración se mantiene igual
+app.config.from_object(Config)
+mail.init_app(app)
+
+logging.basicConfig(level=logging.INFO)
 
 @app.route('/send-invitations', methods=['POST', 'OPTIONS'])
 def send_invitations():
