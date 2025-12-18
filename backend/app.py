@@ -7,21 +7,21 @@ from flask_cors import CORS
 import json
 import logging
 import traceback
-import os
 
 app = Flask(__name__)
 
-# 1. CORRECCIÓN CLAVE: No usar "*" si usas supports_credentials=True.
-# En su lugar, lee los orígenes de una variable de entorno.
-allowed_origins = os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:5173,https://giftly-zeta.vercel.app").split(",")
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
-CORS(app, origins=allowed_origins, supports_credentials=True)
+@app.after_request
+def after_request(response):
+    """
+    Agrega cabeceras CORS necesarias para que los navegadores no bloqueen el preflight.
+    """
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
+    response.headers.add("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+    return response
 
-# 2. ELIMINAR: El bloque @app.after_request debe ser eliminado.
-# La extensión CORS ya se encarga de inyectar las cabeceras correctamente. 
-# Si dejas ambos, las cabeceras se duplican y el navegador rechaza la petición.
-
-# El resto de tu configuración se mantiene igual
 app.config.from_object(Config)
 mail.init_app(app)
 
