@@ -8,78 +8,65 @@ import json
 import logging
 import traceback
 import os
+from threading import Thread
 
 app = Flask(__name__)
 
-# 1. CORRECCIÓN CLAVE: No usar "*" si usas supports_credentials=True.
-# En su lugar, lee los orígenes de una variable de entorno.
-allowed_origins = os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:5173,https://giftly-zeta.vercel.app").split(",")
-
+# Configuración CORS
+allowed_origins = os.getenv(
+    "CORS_ALLOWED_ORIGINS", 
+    "http://localhost:5173,https://giftly-zeta.vercel.app"
+).split(",")
 CORS(app, origins=allowed_origins, supports_credentials=True)
 
-# 2. ELIMINAR: El bloque @app.after_request debe ser eliminado.
-# La extensión CORS ya se encarga de inyectar las cabeceras correctamente. 
-# Si dejas ambos, las cabeceras se duplican y el navegador rechaza la petición.
-
-# El resto de tu configuración se mantiene igual
+# Configuración Flask + Flask-Mail
 app.config.from_object(Config)
 mail.init_app(app)
 
 logging.basicConfig(level=logging.INFO)
 
-@app.route('/send-invitations', methods=['POST', 'OPTIONS'])
-def send_invitations():
-    # ✅ Responder al preflight OPTIONS antes del POST real
-    if request.method == "OPTIONS":
-        return jsonify({"status": "ok"}), 200
 
+# Función que realiza la lógica pesada en background
+def async_send_invitations(data):
     try:
-        data = request.get_json(silent=True)
-        if data is None:
-            return jsonify({"error": "Request must be JSON and Content-Type: application/json"}), 400
-
-        # Extraer campos
         participantsName = data.get("participantsName", [])
         organizer_email = data.get("organizer_email")
         organizer_name = data.get("organizer_name")
         event_name = data.get("event_name", "Evento Giftly")
         location = data.get("location", "Lugar no especificado")
         event_type = data.get("event_type", None)
-        min_amount = data.get("min_amount", 20)  # opcional
+        min_amount = data.get("min_amount", 20)
 
-        # Robustez: si participantsName llegó como string JSON
+        # Normalizar participantsName si viene como string JSON
         if isinstance(participantsName, str):
             try:
                 participantsName = json.loads(participantsName)
             except Exception:
-                return jsonify({"error": "participantsName debe ser un array JSON o lista de objetos"}), 400
+                logging.error("participantsName debe ser un array JSON o lista de objetos")
+                return
 
-        # Validaciones
-        if not isinstance(participantsName, list) or len(participantsName) < 2:
-            return jsonify({"error": "Se necesitan al menos 2 participantes en participantsName"}), 400
+        # Validación básica
+        if not participantsName or len(participantsName) < 2 or not organizer_email:
+            logging.error("Datos insuficientes para generar invitaciones")
+            return
 
-        if not organizer_email:
-            return jsonify({"error": "Se necesita un correo electrónico del organizador (organizer_email)"}), 400
-
-        # Normalizar: asegurar que cada participante tenga 'name'
+        # Normalizar participantes
         normalized = []
         for idx, p in enumerate(participantsName):
             if isinstance(p, dict) and "name" in p and p["name"]:
                 normalized.append({"name": str(p["name"]), "id": p.get("id")})
             else:
-                return jsonify({"error": f"Cada participante debe ser un objeto con clave 'name' (error en índice {idx})"}), 400
-
+                logging.error(f"Participante inválido en índice {idx}")
         participantsName = normalized
 
-        # Generar sorteo seguro
+        # Generar sorteo
         pairs = generate_secret_santa(participantsName)
 
-        # Crear PDFs y protegerlos
+        # Crear PDFs protegidos
         pdf_buffers = []
         for participant in participantsName:
             name = participant["name"]
             receiver = pairs[name]
-
             pdf = create_invitation_pdf(
                 name=name,
                 receiver=receiver,
@@ -88,7 +75,6 @@ def send_invitations():
                 min_amount=min_amount,
                 organizer_name=organizer_name
             )
-
             protected_pdf = protect_pdf(pdf, password=name)
             pdf_buffers.append((f"Invitacion_{name}.pdf", protected_pdf))
 
@@ -180,23 +166,45 @@ def send_invitations():
         </html>
         """
 
-        # Enviar correo al organizador con todos los PDFs adjuntos
+        # Enviar correo
         send_invitation_email(
             recipients=[organizer_email],
             subject=f"Invitaciones Giftly 🎁 - {event_name}",
             body_html=html_template,
             attachments=pdf_buffers
         )
+        logging.info(f"Invitaciones enviadas a {organizer_email} ({len(pdf_buffers)} PDFs)")
 
-        return jsonify({"status": "success", "sent_to": organizer_email, "count": len(pdf_buffers)}), 200
+    except Exception as e:
+        logging.error("Error en async_send_invitations: %s", traceback.format_exc())
+
+
+@app.route('/send-invitations', methods=['POST', 'OPTIONS'])
+def send_invitations():
+    # Responder preflight OPTIONS
+    if request.method == "OPTIONS":
+        return jsonify({"status": "ok"}), 200
+
+    try:
+        data = request.get_json(silent=True)
+        if data is None:
+            return jsonify({"error": "Request must be JSON and Content-Type: application/json"}), 400
+
+        # Lanzar la tarea en background
+        Thread(target=async_send_invitations, args=(data,), daemon=True).start()
+
+        # Responder inmediatamente
+        return jsonify({"status": "queued", "message": "Las invitaciones se están procesando en segundo plano"}), 200
 
     except Exception as e:
         logging.error("Error en /send-invitations: %s", traceback.format_exc())
         return jsonify({"error": "Error interno del servidor", "details": str(e)}), 500
-    
+
+
 @app.route("/ping")
 def ping():
     return "pong", 200
+
 
 if __name__ == "__main__":
     app.run(debug=True)
