@@ -166,7 +166,6 @@ def async_send_invitations(data):
             </body>
             </html>
             """
-
             # Enviar correo
             send_invitation_email(
                 recipients=[organizer_email],
@@ -182,6 +181,30 @@ def async_send_invitations(data):
 @app.route("/ping")
 def ping():
     return "pong", 200
+
+@app.route('/send-invitations', methods=['POST', 'OPTIONS'])
+def send_invitations():
+    # Responder preflight OPTIONS
+    if request.method == "OPTIONS":
+        return jsonify({"status": "ok"}), 200
+
+    try:
+        data = request.get_json(silent=True)
+        if data is None:
+            return jsonify({"error": "Request must be JSON and Content-Type: application/json"}), 400
+
+        # Lanzar la tarea en background
+        Thread(target=async_send_invitations, args=(data,), daemon=True).start()
+
+        # Responder inmediatamente
+        return jsonify({
+            "status": "queued",
+            "message": "Las invitaciones se están procesando en segundo plano"
+        }), 200
+
+    except Exception as e:
+        logging.error("Error en /send-invitations: %s", traceback.format_exc())
+        return jsonify({"error": "Error interno del servidor", "details": str(e)}), 500
 
 
 if __name__ == "__main__":
