@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from config import Config
-from utils.email_sender import mail, send_invitation_email
+from utils.email_sender import send_invitation_email
 from utils.pdf_generator import create_invitation_pdf, protect_pdf
 from utils.santa_logic import generate_secret_santa
 from flask_cors import CORS
@@ -18,10 +18,6 @@ allowed_origins = os.getenv(
     "http://localhost:5173,https://giftly-zeta.vercel.app"
 ).split(",")
 CORS(app, origins=allowed_origins, supports_credentials=True)
-
-# Configuración Flask + Flask-Mail
-app.config.from_object(Config)
-mail.init_app(app)
 
 logging.basicConfig(level=logging.INFO)
 
